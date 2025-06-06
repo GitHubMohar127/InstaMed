@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>InstaMed</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>InstaMed</h1>
+    <form method="POST">
+        <input type="text" name="medicine_name" placeholder="Enter medicine name" required />
+        <button type="submit">Search</button>
+    </form>
+
+    {% if error_msg %}
+        <p style="color:red;">{{ error_msg }}</p>
+    {% endif %}
+
+    {% if medicine_info %}
+        <h2>✅ Match found!</h2>
+        <ul>
+            <li><strong>Medicine Name:</strong> {{ medicine_info["Medicine Name"] }}</li>
+            <li><strong>Uses:</strong> {{ medicine_info["Uses"] }}</li>
+            <li><strong>Composition:</strong> {{ medicine_info["Composition"] }}</li>
+            <li><strong>Side Effects:</strong> {{ medicine_info["Side Effects"] }}</li>
+            <li><strong>Manufacturer:</strong> {{ medicine_info["Manufacturer"] }}</li>
+            <li><strong>Average Review:</strong> {{ medicine_info["Average Review"] }}</li>
+        </ul>
+        {% if image_data %}
+            <img src="data:image/jpeg;base64,{{ image_data }}" alt="Medicine Image" width="300"/>
+        {% endif %}
+    {% endif %}
+</body>
+</html>
