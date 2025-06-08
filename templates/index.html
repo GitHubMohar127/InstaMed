@@ -4,14 +4,21 @@
     <meta charset="UTF-8" />
     <title>InstaMed</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+    {% if medicine_info %}
+        <form method="POST" action="{{ url_for('bookmark') }}">
+            <input type="hidden" name="medicine_name" value="{{ medicine_info['Medicine Name'] }}">
+            <button type="submit">🔖 Bookmark this medicine</button>
+        </form>
+    {% endif %}
+
     <h1>InstaMed</h1>
-    <form method="POST">
-        <input type="text" name="medicine_name" placeholder="Enter medicine name" required />
+    <form method="POST" autocomplete="off">
+        <input type="text" name="medicine_name" id="medicineInput" placeholder="Enter medicine name" required />
         <button type="submit">Search</button>
     </form>
+      <ul id="suggestions" style="list-style:none; padding-left:0;"></ul>
 
     {% if error_msg %}
         <p style="color:red;">{{ error_msg }}</p>
@@ -31,5 +38,48 @@
             <img src="data:image/jpeg;base64,{{ image_data }}" alt="Medicine Image" width="300"/>
         {% endif %}
     {% endif %}
+
+    <!-- ✅ Place script at bottom so DOM is loaded -->
+    <script>
+    window.onload = function () {
+        const input = document.getElementById('medicineInput');
+        const suggestions = document.getElementById('suggestions');
+
+        input.addEventListener('input', function () {
+            const query = input.value.trim();
+            if (query.length < 2) {
+                suggestions.innerHTML = '';
+                return;
+            }
+
+            fetch(`/suggest?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    suggestions.innerHTML = '';
+                    data.forEach(med => {
+                        const item = document.createElement('li');
+                        item.textContent = med;
+                        item.style.cursor = 'pointer';
+                        item.style.padding = '5px';
+                        item.style.borderBottom = '1px solid #ccc';
+
+                        item.addEventListener('mouseover', () => {
+                            item.style.backgroundColor = '#f0f0f0';
+                        });
+                        item.addEventListener('mouseout', () => {
+                            item.style.backgroundColor = '';
+                        });
+
+                        item.addEventListener('click', () => {
+                            input.value = med;
+                            suggestions.innerHTML = '';
+                        });
+                        suggestions.appendChild(item);
+                    });
+                });
+        });
+    };
+    </script>
 </body>
 </html>
+
