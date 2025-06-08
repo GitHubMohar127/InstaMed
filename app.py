@@ -7,6 +7,34 @@ import requests
 from io import BytesIO
 import base64
 import os
+def init_db():
+    conn = sqlite3.connect("medicine.db")
+    c = conn.cursor()
+
+    # Create users table if it doesn't exist
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
+    ''')
+
+    # Create bookmarks table if it doesn't exist
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS bookmarks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            medicine_name TEXT,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+    ''')
+
+    conn.commit()
+    conn.close()
+
+# Call this at the top of your app
+init_db()
 
 app = Flask(__name__)
 app.secret_key = 'mohar-medicine-app-2004'  # Use an environment variable in production
